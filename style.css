@@ -1,0 +1,20 @@
+body {
+  background: pink;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+#weather-container {
+  background: rgb(246, 134, 153);
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px black;
+  backdrop-filter: blur(10px);
+  border: 1px solid black;
+  text-align: center;
+}
