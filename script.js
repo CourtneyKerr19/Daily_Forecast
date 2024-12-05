@@ -17,3 +17,18 @@ async function getWeather(city) {
     console.log('Error fetching data', error);
   }
 }
+
+function displayWeather(data) {
+  document.getElementById('date-time').textContent = `${new Date().toLocaleString()}`;
+  const city = `${data.name}, ${data.sys.country}`;
+  document.getElementById('weather-info').innerHTML = `<p>${city}</p>`;
+
+  const weatherIcon = data.weather[0].icon;
+  const description = data.weather[0].description;
+  const temp = data.main.temp;
+  document.getElementById("weather-icon").src = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
+  document.getElementById("weather-icon").style.display = "block";
+  document.getElementById("temp-div").textContent = `${temp}°C - ${description}`;
+
+  displayAdditionalInfo(data);
+}
