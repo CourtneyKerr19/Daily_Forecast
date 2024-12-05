@@ -64,3 +64,15 @@ function displayHourlyForecast(hourlyData) {
     hourlyForecastDiv.appendChild(hourItem);
   });
 }
+
+document.getElementById('search-button').addEventListener('click', () => {
+  const city = document.getElementById('city').value;
+  fetchWeatherData(city);
+});
+
+document.getElementById('city').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    const city = document.getElementById('city').value;
+    fetchWeatherData(city); 
+  }
+});
