@@ -32,3 +32,16 @@ function displayWeather(data) {
 
   displayAdditionalInfo(data);
 }
+
+function displayAdditionalInfo(data) {
+  const humidity = data.main.humidity;
+  const windSpeed = data.wind.speed;
+  const pressure = data.main.pressure;
+
+  const additionalInfoDiv = document.getElementById("additional-info");
+  additionalInfoDiv.innerHTML = `
+    <p>Humidity: ${humidity}%</p>
+    <p>Wind Speed: ${windSpeed} m/s</p>
+    <p>Pressure: ${pressure} hPa</p>
+  `;
+}
