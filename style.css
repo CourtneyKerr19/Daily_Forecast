@@ -96,6 +96,16 @@ button:hover {
   margin-bottom: 10px;
 }
 
+#additional-info {
+  font-size: 16px;
+  color:blue;
+  margin-top: 20px;
+}
+
+#additional-info p {
+  margin: 5px 0;
+}
+
 #hourly-heading {
   color: white;
   margin-top: 10px;
