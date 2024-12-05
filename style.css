@@ -32,3 +32,19 @@ input {
   border: 1px solid white;
   margin-top: 20px;
 }
+
+button {
+  background: #7508c4;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100px;
+  font-size: 15px;
+}
+
+button:hover {
+  background: pink;
+}
