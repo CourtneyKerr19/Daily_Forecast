@@ -45,3 +45,22 @@ function displayAdditionalInfo(data) {
     <p>Pressure: ${pressure} hPa</p>
   `;
 }
+
+function displayHourlyForecast(hourlyData) {
+  const hourlyForecastDiv = document.getElementById("hourly-forecast");
+  hourlyForecastDiv.innerHTML = "";
+  hourlyData.forEach((hour) => {
+    const hourItem = document.createElement("div");
+    hourItem.classList.add("hourly-item");
+    const time = new Date(hour.dt * 1000).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    hourItem.innerHTML = `
+      <p>${time}</p>
+      <img src="http://openweathermap.org/img/wn/${hour.weather[0].icon}.png" alt="${hour.weather[0].description}">
+      <p>${hour.main.temp}°C</p>
+    `;
+    hourlyForecastDiv.appendChild(hourItem);
+  });
+}
