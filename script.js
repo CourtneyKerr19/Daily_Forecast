@@ -1,97 +1,95 @@
 const apiKey = "616d568b21e6502c2bcf3499b1b78e15";
 
+document.getElementById('search-button').addEventListener('click', () => {
+    const city = document.getElementById('city').value.trim();
+    if (!city) {
+        alert('Please enter a city');
+        return;
+    }
+    fetchWeatherData(city);
+});
+
 async function fetchWeatherData(city) {
-  try {
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
-    );
+    try {
+        const weatherResponse = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
+        );
+        const weatherData = await weatherResponse.json();
 
-    if (!response.ok) {
-      throw new Error(`City not found: ${city}`);
+        if (weatherResponse.ok) {
+            displayWeather(weatherData);
+        } else {
+            throw new Error(weatherData.message || 'Failed to fetch weather data.');
+        }
+
+        const forecastResponse = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
+        );
+        const forecastData = await forecastResponse.json();
+
+        if (forecastResponse.ok) {
+            displayHourlyForecast(forecastData.list);
+        } else {
+            throw new Error(forecastData.message || 'Failed to fetch hourly forecast data.');
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        alert(`Error: ${error.message}`);
     }
-
-    const data = await response.json();
-    displayWeather(data);
-
-    const hourlyResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
-    );
-
-    if (!hourlyResponse.ok) {
-      throw new Error("Error fetching hourly forecast.");
-    }
-
-    const hourlyData = await hourlyResponse.json();
-    displayHourlyForecast(hourlyData.list.slice(0, 5)); // Show next 5 hours
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    alert(error.message);
-  }
 }
 
 function displayWeather(data) {
-  document.getElementById("date-time").textContent = `${new Date().toLocaleString()}`;
-  const city = `${data.name}, ${data.sys.country}`;
-  document.getElementById("weather-info").innerHTML = `<p>${city}</p>`;
+  const tempDiv = document.getElementById('temp-div');
+  const weatherInfo = document.getElementById('weather-info');
+  const weatherIcon = document.getElementById('weather-icon');
+  const dateTimeDiv = document.getElementById('date-time'); // Add reference
 
-  const weatherIcon = data.weather[0].icon;
+  // Clear previous content
+  tempDiv.innerHTML = '';
+  weatherInfo.innerHTML = '';
+  dateTimeDiv.innerHTML = ''; // Clear previous time display
+
+  const cityName = data.name;
+  const temp = Math.round(data.main.temp);
   const description = data.weather[0].description;
-  const temp = data.main.temp;
-  document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
-  document.getElementById("weather-icon").style.display = "block";
-  document.getElementById("temp-div").textContent = `${temp}°C - ${description}`;
+  const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
 
-  displayAdditionalInfo(data);
-}
+  // Current Time Logic
+  const currentTime = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+  });
 
-function displayAdditionalInfo(data) {
-  const humidity = data.main.humidity;
-  const windSpeed = data.wind.speed;
-  const pressure = data.main.pressure;
+  dateTimeDiv.innerHTML = `<p>Current Time: ${currentTime}</p>`; // Display time
 
-  const additionalInfoDiv = document.getElementById("additional-info");
-  additionalInfoDiv.innerHTML = `
-    <p>Humidity: ${humidity}%</p>
-    <p>Wind Speed: ${windSpeed} m/s</p>
-    <p>Pressure: ${pressure} hPa</p>
-  `;
+  tempDiv.innerHTML = `<p>${temp}°C</p>`;
+  weatherInfo.innerHTML = `<p>${cityName}</p><p>${description}</p>`;
+  weatherIcon.src = iconUrl;
+  weatherIcon.style.display = 'block';
 }
 
 function displayHourlyForecast(hourlyData) {
-  const hourlyForecastDiv = document.getElementById("hourly-forecast");
-  hourlyForecastDiv.innerHTML = ""; // Clear previous data
-  hourlyData.forEach((hour) => {
-    const hourItem = document.createElement("div");
-    hourItem.classList.add("hourly-item");
-    const time = new Date(hour.dt * 1000).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+    const hourlyForecastDiv = document.getElementById('hourly-forecast');
+    hourlyForecastDiv.innerHTML = '';
+
+    const next24Hours = hourlyData.slice(0, 8); // Show next 24 hours in 3-hour intervals
+
+    next24Hours.forEach((item) => {
+        const time = new Date(item.dt * 1000).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+        const temp = Math.round(item.main.temp);
+        const iconUrl = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
+
+        const hourlyItem = `
+            <div class="hourly-item">
+                <p>${time}</p>
+                <img src="${iconUrl}" alt="${item.weather[0].description}">
+                <p>${temp}°C</p>
+            </div>
+        `;
+        hourlyForecastDiv.innerHTML += hourlyItem;
     });
-    hourItem.innerHTML = `
-      <p>${time}</p>
-      <img src="https://openweathermap.org/img/wn/${hour.weather[0].icon}.png" alt="${hour.weather[0].description}">
-      <p>${hour.main.temp}°C</p>
-    `;
-    hourlyForecastDiv.appendChild(hourItem);
-  });
 }
-
-document.getElementById("search-button").addEventListener("click", () => {
-  const city = document.getElementById("city").value.trim();
-  if (city) {
-    fetchWeatherData(city);
-  } else {
-    alert("Please enter a city name.");
-  }
-});
-
-document.getElementById("city").addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    const city = document.getElementById("city").value.trim();
-    if (city) {
-      fetchWeatherData(city);
-    } else {
-      alert("Please enter a city name.");
-    }
-  }
-});
